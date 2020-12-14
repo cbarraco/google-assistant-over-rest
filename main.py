@@ -123,12 +123,18 @@ if language_code == None:
 
 assistant = RestAssistant(language_code, device_model_id, device_id, grpc_channel)
 
-@app.route('/', methods=['POST'])
+@app.route('/command', methods=['POST'])
 def command_api():
     logging.info('Received method call: %s', request.json)
     command = request.json["command"]
     logging.info('Received command: %s', command)
-    return assistant.assist(text_query=command)
+    reply = assistant.assist(text_query=command)
+    if reply == None:
+        return ""
+    response = {
+        "result": reply
+    }
+    return json.dumps(response)
     
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    app.run(host='0.0.0.0')
