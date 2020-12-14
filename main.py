@@ -26,8 +26,6 @@ from google.assistant.embedded.v1alpha2 import (
     embedded_assistant_pb2_grpc
 )
 
-import assistant_helpers
-
 from bs4 import BeautifulSoup
 
 from flask import Flask
@@ -87,12 +85,10 @@ class RestAssistant(object):
                 text_query=text_query,
             )
             req = embedded_assistant_pb2.AssistRequest(config=config)
-            assistant_helpers.log_assist_request_without_audio(req)
             yield req
 
         text_response = None
         for resp in self.assistant.Assist(iter_assist_requests(), DEFAULT_GRPC_DEADLINE):
-            assistant_helpers.log_assist_response_without_audio(resp)
             if resp.screen_out.data:
                 soup = BeautifulSoup(resp.screen_out.data, 'html.parser')
                 text_response = soup.get_text()
@@ -107,7 +103,8 @@ class RestAssistant(object):
 logging.basicConfig(level=logging.DEBUG)
 
 try:
-    with open('/usr/src/app/credentials.json', 'r') as f:
+    # with open('/usr/src/app/credentials.json', 'r') as f:
+    with open('credentials.json', 'r') as f:
         credentials = google.oauth2.credentials.Credentials(token=None, **json.load(f))
         http_request = google.auth.transport.requests.Request()
         credentials.refresh(http_request)
@@ -126,8 +123,12 @@ if language_code == None:
 
 assistant = RestAssistant(language_code, device_model_id, device_id, grpc_channel)
 
-@app.route('/command', methods=['POST'])
+@app.route('/', methods=['POST'])
 def command_api():
+    logging.info('Received method call: %s', request.json)
     command = request.json["command"]
+    logging.info('Received command: %s', command)
     return assistant.assist(text_query=command)
     
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
