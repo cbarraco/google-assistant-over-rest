@@ -23,3 +23,4 @@ docker run
     -v <SOME_PATH_ON_YOUR_SYSTEM>/credentials.json:/usr/src/app/credentials.json
     cbarraco/google-assistant-over-rest
 ```
+In order to get the above fields, you need to create a new project on https://console.actions.google.com/ using the "Other" project type. Once the project is created, you can request a credentials.json file using the google-oauth-tool and your client secret.
