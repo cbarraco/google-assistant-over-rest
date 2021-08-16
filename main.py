@@ -127,6 +127,7 @@ def command_api():
     command = request.json["command"]
     logging.info('Received command: %s', command)
     reply = assistant.assist(text_query=command)
+    logging.info('Received reply from GA: %s', reply)
     if reply == None:
         return ""
     response = {
