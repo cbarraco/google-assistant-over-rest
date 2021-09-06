@@ -1,9 +1,4 @@
-all: docker-push
+all: docker-build-and-push-multiarch
 
-.PHONY: docker-build
-docker-build:
-	docker build -t cbarraco/google-assistant-over-rest:latest .
-
-.PHONY: docker-push
-docker-push: docker-build
-	docker push cbarraco/google-assistant-over-rest:latest
+.PHONY: docker-build-and-push-multiarch
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v7 -t cbarraco/google-assistant-over-rest:latest --push .
